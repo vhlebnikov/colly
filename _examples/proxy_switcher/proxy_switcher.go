@@ -25,6 +25,12 @@ func main() {
 		log.Printf("%s\n", bytes.Replace(r.Body, []byte("\n"), nil, -1))
 	})
 
+	// Print the error in case of proxy problems
+	c.OnError(func(r *colly.Response, err error) {
+		log.Printf("Proxy Address: %s\n", r.Request.ProxyURL)
+		log.Printf("Error: %s\n", err)
+	})
+
 	// Fetch httpbin.org/ip five times
 	for i := 0; i < 5; i++ {
 		c.Visit("https://httpbin.org/ip")
