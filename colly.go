@@ -295,6 +295,8 @@ var envMap = map[string]func(*Collector, string){
 	},
 }
 
+const ProxyUrlHeader = "X-Colly-URL-Proxy-Header"
+
 var urlParser = whatwgUrl.NewParser(whatwgUrl.WithPercentEncodeSinglePercentSign())
 
 // NewCollector creates a new Collector instance with default configuration
@@ -714,6 +716,9 @@ func (c *Collector) fetch(u, method string, depth int, requestData io.Reader, ct
 	response, err := c.backend.Cache(req, c.MaxBodySize, checkHeadersFunc, c.CacheDir)
 	if proxyURL, ok := req.Context().Value(ProxyURLKey).(string); ok {
 		request.ProxyURL = proxyURL
+	}
+	if request.ProxyURL == "" {
+		request.ProxyURL = req.Header.Get(ProxyUrlHeader)
 	}
 	if err := c.handleOnError(response, err, request, ctx); err != nil {
 		return err
